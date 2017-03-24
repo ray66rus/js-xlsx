@@ -7662,7 +7662,7 @@ function write_ws_xml_cols(ws, cols) {
 	var o = ["<cols>"], col, width;
 	for(var i = 0; i != cols.length; ++i) {
 		if(!(col = cols[i])) continue;
-		var p = {min:i+1,max:i+1};
+		var p = {min:i+1,max:i+1,bestFit:1};
 		/* wch (chars), wpx (pixels) */
 		width = -1;
 		if(col.wpx) width = px2char(col.wpx);
@@ -7828,7 +7828,11 @@ function write_ws_xml_data(ws, opts, idx, wb) {
 			if(ws[ref] === undefined) continue;
 			if((cell = write_ws_xml_cell(ws[ref], ref, ws, opts, idx, wb)) != null) r.push(cell);
 		}
-		if(r.length > 0) o[o.length] = (writextag('row', r.join(""), {r:rr}));
+		var rowAttrs = {r:rr};
+		if (ws['!rows'] && ws['!rows'][R]) {
+			if (ws['!rows'][R].ht) { rowAttrs.customHeight = 1; rowAttrs.ht = ws['!rows'][R].ht }
+		}
+		if(r.length > 0) o[o.length] = (writextag('row', r.join(""), rowAttrs));
 	}
 	return o.join("");
 }
